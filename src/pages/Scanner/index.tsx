@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import { Scanner as QrScanner } from '@yudiel/react-qr-scanner';
 import {
     Box,
-    Button,
     Flex,
     Heading,
     Icon,
     Text,
     VStack,
 } from '@chakra-ui/react';
+import { Button } from '@/components/ui/button';
 import { CheckCircleIcon, ExclamationTriangleIcon } from '@heroicons/react/24/solid';
 
 type ScannerState = 'scanning' | 'success' | 'error';

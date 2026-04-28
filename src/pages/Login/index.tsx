@@ -3,17 +3,20 @@ import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import {
     Box,
-    Button,
-    Field,
     Flex,
     Heading,
     Input,
     Text,
     VStack,
 } from '@chakra-ui/react';
+import { Button } from '@/components/ui/button';
+import { Field } from '@/components/ui/field';
+import { toaster } from '@/components/ui/toaster';
+import api from '@/services/api';
+import { AxiosError } from 'axios';
 
 interface LoginFormData {
-    username: string;
+    email: string;
     password: string;
 }
 
@@ -25,10 +28,33 @@ const Login: React.FC = () => {
         formState: { errors, isSubmitting },
     } = useForm<LoginFormData>();
 
-    const onSubmit = async (_data: LoginFormData) => {
-        // Simula autenticación exitosa
-        localStorage.setItem('authToken', 'dummy-token');
-        navigate('/scanner');
+    const onSubmit = async (data: LoginFormData) => {
+        try {
+            const response = await api.post('/operator-login', data);
+            
+            // Suponiendo que el token viene en response.data.token o similar
+            // Basado en experiencias comunes con Magneticash
+            const token = response.data.token || response.data.access_token || 'dummy-token';
+            
+            localStorage.setItem('authToken', token);
+            
+            toaster.create({
+                title: '¡Bienvenido!',
+                description: 'Ingreso exitoso',
+                type: 'success',
+            });
+            
+            navigate('/scanner');
+        } catch (error) {
+            const axiosError = error as AxiosError<{ message?: string }>;
+            const message = axiosError.response?.data?.message || 'Credenciales inválidas o error de conexión';
+            
+            toaster.create({
+                title: 'Error al ingresar',
+                description: message,
+                type: 'error',
+            });
+        }
     };
 
     return (
@@ -79,23 +105,28 @@ const Login: React.FC = () => {
                 <form id="login-form" onSubmit={handleSubmit(onSubmit)}>
                     <VStack gap={5}>
                         <Field
-                            errorText={errors.username?.message}
-                            invalid={!!errors.username}
-                            label="Usuario"
+                            errorText={errors.email?.message}
+                            invalid={!!errors.email}
+                            label="Correo Electrónico"
                         >
                             <Input
-                                id="login-username"
-                                autoComplete="username"
+                                id="login-email"
+                                autoComplete="email"
                                 borderColor="whiteAlpha.200"
                                 color="white"
-                                placeholder="tu_usuario"
+                                placeholder="tu@email.com"
+                                type="email"
                                 _placeholder={{ color: 'whiteAlpha.400' }}
                                 _focus={{
                                     borderColor: 'purple.400',
                                     boxShadow: '0 0 0 1px var(--chakra-colors-purple-400)',
                                 }}
-                                {...register('username', {
-                                    required: 'El usuario es obligatorio',
+                                {...register('email', {
+                                    required: 'El email es obligatorio',
+                                    pattern: {
+                                        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                                        message: 'Email inválido',
+                                    },
                                 })}
                             />
                         </Field>
