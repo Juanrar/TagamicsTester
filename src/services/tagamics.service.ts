@@ -1,6 +1,13 @@
 import api from './api';
-import type { Tagamic } from '@/models/tagamic.model';
+import type { TagamicResponseData } from '@/models/tagamic.model';
+
+export type APIResponse = {
+    status: string;
+    code: number;
+    message: string;
+    data: TagamicResponseData;
+};
 
 export const getTagamic = async (params: { id: string }) => {
-    return api.get<{ tagamic: Tagamic }>(`tags/tagamics/${params.id}/activate`);
+    return api.get<APIResponse>(`tags/tagamics/${params.id}/activate`);
 };
