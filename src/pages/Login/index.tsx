@@ -1,0 +1,154 @@
+import React from 'react';
+import { useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
+import {
+    Box,
+    Button,
+    Field,
+    Flex,
+    Heading,
+    Input,
+    Text,
+    VStack,
+} from '@chakra-ui/react';
+
+interface LoginFormData {
+    username: string;
+    password: string;
+}
+
+const Login: React.FC = () => {
+    const navigate = useNavigate();
+    const {
+        register,
+        handleSubmit,
+        formState: { errors, isSubmitting },
+    } = useForm<LoginFormData>();
+
+    const onSubmit = async (_data: LoginFormData) => {
+        // Simula autenticación exitosa
+        localStorage.setItem('authToken', 'dummy-token');
+        navigate('/scanner');
+    };
+
+    return (
+        <Flex
+            align="center"
+            bgGradient="to-b"
+            gradientFrom="gray.900"
+            gradientTo="purple.950"
+            flex="1"
+            justify="center"
+            minH="calc(100vh - 80px)"
+            px={4}
+        >
+            <Box
+                backdropFilter="blur(12px)"
+                bg="whiteAlpha.50"
+                borderColor="whiteAlpha.100"
+                borderRadius="2xl"
+                borderWidth="1px"
+                boxShadow="0 25px 50px -12px rgba(168, 85, 247, 0.25)"
+                maxW="400px"
+                p={8}
+                w="full"
+            >
+                {/* Logo / título */}
+                <VStack gap={2} mb={8}>
+                    <Box
+                        bg="purple.500"
+                        borderRadius="xl"
+                        mb={2}
+                        p={3}
+                    >
+                        <Text fontSize="2xl">🔐</Text>
+                    </Box>
+                    <Heading
+                        color="white"
+                        fontSize="2xl"
+                        fontWeight="bold"
+                        textAlign="center"
+                    >
+                        Tagamics Tester
+                    </Heading>
+                    <Text color="whiteAlpha.600" fontSize="sm" textAlign="center">
+                        Ingresá tus credenciales para continuar
+                    </Text>
+                </VStack>
+
+                <form id="login-form" onSubmit={handleSubmit(onSubmit)}>
+                    <VStack gap={5}>
+                        <Field
+                            errorText={errors.username?.message}
+                            invalid={!!errors.username}
+                            label="Usuario"
+                        >
+                            <Input
+                                id="login-username"
+                                autoComplete="username"
+                                borderColor="whiteAlpha.200"
+                                color="white"
+                                placeholder="tu_usuario"
+                                _placeholder={{ color: 'whiteAlpha.400' }}
+                                _focus={{
+                                    borderColor: 'purple.400',
+                                    boxShadow: '0 0 0 1px var(--chakra-colors-purple-400)',
+                                }}
+                                {...register('username', {
+                                    required: 'El usuario es obligatorio',
+                                })}
+                            />
+                        </Field>
+
+                        <Field
+                            errorText={errors.password?.message}
+                            invalid={!!errors.password}
+                            label="Contraseña"
+                        >
+                            <Input
+                                id="login-password"
+                                autoComplete="current-password"
+                                borderColor="whiteAlpha.200"
+                                color="white"
+                                placeholder="••••••••"
+                                type="password"
+                                _placeholder={{ color: 'whiteAlpha.400' }}
+                                _focus={{
+                                    borderColor: 'purple.400',
+                                    boxShadow: '0 0 0 1px var(--chakra-colors-purple-400)',
+                                }}
+                                {...register('password', {
+                                    required: 'La contraseña es obligatoria',
+                                    minLength: {
+                                        value: 4,
+                                        message: 'Mínimo 4 caracteres',
+                                    },
+                                })}
+                            />
+                        </Field>
+
+                        <Button
+                            id="login-submit"
+                            bg="purple.500"
+                            color="white"
+                            form="login-form"
+                            loading={isSubmitting}
+                            loadingText="Ingresando..."
+                            mt={2}
+                            size="lg"
+                            type="submit"
+                            w="full"
+                            _hover={{ bg: 'purple.400', transform: 'translateY(-1px)' }}
+                            _active={{ transform: 'translateY(0)' }}
+                            transition="all 0.2s"
+                        >
+                            Ingresar
+                        </Button>
+                    </VStack>
+                </form>
+            </Box>
+        </Flex>
+    );
+};
+
+export default Login;
